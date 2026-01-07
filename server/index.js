@@ -99,4 +99,5 @@ app.post("/api/admin/import", auth, adminOnly, upload.single("file"), (req, res)
   });
 });
 
+app.get("/", (req, res) => res.send("QR Scan API is running ✅"));
 app.listen(PORT, () => console.log("API running on port", PORT));
