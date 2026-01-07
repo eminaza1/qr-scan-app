@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scan QR</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <h2>Scan QR Code</h2>
+
+  <button onclick="logout()">Logout</button>
+  <br/><br/>
+
+  <div id="reader" style="width:300px;"></div>
+  <br/>
+
+  <input id="manual" placeholder="Enter QR ID (e.g. KIT-1009)" />
+  <button onclick="lookup()">Lookup</button>
+
+  <pre id="result"></pre>
+
+<script>
+const API = "http://localhost:3001"; // TEMP — will change later
+const token = localStorage.token;
+if (!token) location.href = "index.html";
+
+function logout() {
+  localStorage.clear();
+  location.href = "index.html";
+}
+
+function normalizeId(v) {
+  const c = String(v || "").trim().toUpperCase();
+  return /^[A-Z0-9-]{3,40}$/.test(c) ? c : null;
+}
+
+async function lookup(code) {
+  const id = normalizeId(code || manual.value);
+  if (!id) {
+    result.textContent = "Invalid QR ID format";
+    return;
+  }
+
+  const res = await fetch(API + "/api/qrcodes/" + id, {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const data = await res.json();
+  result.textContent = JSON.stringify(data, null, 2);
+}
+
+new Html5Qrcode("reader").start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  decoded => lookup(decoded)
+);
+</script>
+</body>
+</html>
