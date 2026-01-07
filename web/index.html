@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR Scan Login</title>
+</head>
+<body>
+  <h2>QR Scan App</h2>
+
+  <input id="email" placeholder="Email" />
+  <br/><br/>
+  <input id="password" type="password" placeholder="Password" />
+  <br/><br/>
+
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+
+  <p id="msg"></p>
+
+<script>
+const API = "http://localhost:3001"; // TEMP — we will change this later
+
+async function login() {
+  const res = await fetch(API + "/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: email.value,
+      password: password.value
+    })
+  });
+
+  if (!res.ok) {
+    msg.textContent = "Login failed";
+    return;
+  }
+
+  const data = await res.json();
+  localStorage.token = data.token;
+  location.href = "scan.html";
+}
+
+async function register() {
+  await fetch(API + "/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: email.value,
+      password: password.value
+    })
+  });
+  msg.textContent = "Registered. Now login.";
+}
+</script>
+</body>
+</html>
